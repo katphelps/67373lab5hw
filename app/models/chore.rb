@@ -4,17 +4,18 @@ class Chore < ApplicationRecord
 
     validates_date :due_on
 
-    scope :by_task, -> { order('task') }
+    scope :by_task, -> {joins(:task).order('tasks.name') }
     scope :chronological, -> {order('due_on')}
-    scope :pending, -> { where(completed: false) }
-    scope :done, ->  { where(completed: true) }
-    scope :upcoming, ->  { where('due_on > ?', Date.today) }
-    scope :past, ->  { where('due_on > ?', Date.today) }
+    scope :pending, -> {where(completed: false)}
+    scope :done, ->  {where(completed: true)}
+    scope :upcoming, ->  {where('due_on >= ?', Date.today)}
+    scope :past, ->  {where('due_on < ?', Date.today)}
 
     def status
-        if self.completed == true
+        if self.completed?
             'Completed'
+        else
+            'Pending'
         end
-        'Pending'
     end
 end
